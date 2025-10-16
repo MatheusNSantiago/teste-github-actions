@@ -28,11 +28,10 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Obter diff do commit
+      - name: Obter diff do último commit
         id: get_diff
         run: |
-          git fetch origin main
-          DIFF=$(git diff origin/main HEAD)
+          DIFF=$(git diff HEAD^ HEAD)
           echo "diff<<EOF" >> $GITHUB_OUTPUT
           echo "$DIFF" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
@@ -52,7 +51,7 @@ jobs:
                   "content": "Resuma esse diff de código:\n'"${{ steps.get_diff.outputs.diff }}"'"
                 }
               ],
-              "model": "openai/gpt-4o"
+              "model": "openai/gpt-5"
             }')
           SUMMARY=$(echo "$RESPONSE" | jq -r '.choices[0].message.content')
           echo "summary<<EOF" >> $GITHUB_OUTPUT
