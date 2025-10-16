@@ -53,7 +53,7 @@ jobs:
                 content: "Resuma as mudanças presentes no diff de código abaixo. Sua resposta deve ser concisa, direto ao ponto e sem introduções:\n\($diff)"
               }
             ],
-            model: "openai/gpt-5"
+            model: "openai/gpt-4o"
           }')
 
           RESPONSE=$(curl -s "https://models.github.ai/inference/chat/completions" \
