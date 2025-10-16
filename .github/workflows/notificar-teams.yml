@@ -1,5 +1,3 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI
 
 # Controls when the workflow will run
@@ -42,4 +40,10 @@ jobs:
       uses: thechetantalwar/teams-notify@v2
       with:
         teams_webhook_url: https://defaultea0c290738d241818750b0b190b604.43.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/006566e0d7b1409d98ab461728de036e/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=XGks5YNdObnxup17kOVPy7mIyC1l0KMP9QpwvDgi7hM
-        message: "<h1> Título topper </h1></br> Outras paradas"
+        message: |
+          <h1> Novo deploy no <strong>${{ github.repository }}</strong> </h1>
+          <p><strong>Branch:</strong> <code>${{ github.ref_name }}</code></p>
+          <p><strong>Commit:</strong> <em>${{ github.event.head_commit.message }}</em></p>
+          <hr/>
+          <p> Bing Bong Xin Biling</p>
+
