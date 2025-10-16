@@ -42,20 +42,28 @@ jobs:
         id: summarize
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DIFF_CONTENT: ${{ steps.get_diff.outputs.diff }}
         run: |
+          JSON_PAYLOAD=$(jq -n --arg diff "$DIFF_CONTENT" '{
+            messages: [
+              {
+                role: "user",
+                content: "Resuma esse diff de código:\n\($diff)"
+              }
+            ],
+            model: "openai/gpt-4o"
+          }')
+
           RESPONSE=$(curl -s "https://models.github.ai/inference/chat/completions" \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $GITHUB_TOKEN" \
-            -d '{
-              "messages": [
-                {
-                  "role": "user",
-                  "content": "Resuma esse diff de código:\n'"${{ steps.get_diff.outputs.diff }}"'"
-                }
-              ],
-              "model": "openai/gpt-5"
-            }')
+            -d "$JSON_PAYLOAD")
+
+          echo "Resposta da API:"
+          echo "$RESPONSE"
+
           SUMMARY=$(echo "$RESPONSE" | jq -r '.choices[0].message.content')
+
           echo "summary<<EOF" >> $GITHUB_OUTPUT
           echo "$SUMMARY" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
@@ -66,9 +74,11 @@ jobs:
     steps:
       - name: Extrair nome do repositório
         id: repo_name
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
-          REPO_NAME=$(echo "${{ github.repository }}" | cut -d'/' -f2)
-          echo "name=$REPO_NAME" >> $GITHUB_OUTPUT
+          REPO_NAME=$(echo "$GITHUB_REPOSITORY" | cut -d'/' -f2)
+          echo "name=$REPO_NAME" >> "$GITHUB_OUTPUT"
 
       - name: Enviar notificação para o Teams
         uses: thechetantalwar/teams-notify@v2
@@ -76,7 +86,6 @@ jobs:
           teams_webhook_url: https://defaultea0c290738d241818750b0b190b604.43.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/006566e0d7b1409d98ab461728de036e/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=XGks5YNdObnxup17kOVPy7mIyC1l0KMP9QpwvDgi7hM
           message: |
             <h1>🚀 Novo deploy em <strong>${{ steps.repo_name.outputs.name }}</strong></h1>
-
             <p><strong>Branch:</strong> <code>${{ github.ref_name }}</code></p>
             <p><strong>Commit:</strong> <em>${{ github.event.head_commit.message }}</em></p>
             <hr/>
