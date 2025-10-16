@@ -50,10 +50,10 @@ jobs:
             messages: [
               {
                 role: "user",
-                content: "Resuma esse diff de código:\n\($diff)"
+                content: "Resuma as mudanças presentes no diff de código abaixo. Sua resposta deve ser concisa, direto ao ponto e sem introduções:\n\($diff)"
               }
             ],
-            model: "openai/gpt-4o"
+            model: "openai/gpt-5"
           }')
 
           RESPONSE=$(curl -s "https://models.github.ai/inference/chat/completions" \
