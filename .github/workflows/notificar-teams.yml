@@ -24,6 +24,8 @@ jobs:
   summarize_diff:
     needs: build
     runs-on: ubuntu-latest
+    outputs:
+      summary: ${{ steps.summarize.outputs.summary }}
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
